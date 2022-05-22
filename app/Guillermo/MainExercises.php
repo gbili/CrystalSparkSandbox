@@ -74,7 +74,6 @@ class MainExercises
     }
 
     public static function loadCityFactory(System $sandra, EntityFactory $countryFactory): EntityFactory {
-        $entityFactory = self::loadCountryFactory($sandra);
         $entityFactory = new EntityFactory('city','generalCityFile',$sandra);
         $entityFactory->joinFactory('locatedIn', $countryFactory);
         $entityFactory->populateLocal();
@@ -85,8 +84,6 @@ class MainExercises
     }
 
     public function exercise3(string $favoriteLanguage = null):array{
-
-
         $sandra = new System('testgame',true,env('DB_HOST'),env('DB_DATABASE'),
             env('DB_USERNAME'),env('DB_PASSWORD'));
 
@@ -98,7 +95,9 @@ class MainExercises
         $cityCountryStringOrNullArray = array_map(
             function (Entity $city) use ($favoriteLanguage) {
                 $countries = $city->getJoinedEntities('locatedIn');
-                if (self::areEntitiesEmpty($countries)) return null;
+                if (self::areEntitiesEmpty($countries)) {
+                    return null;
+                }
                 $country = current($countries);
                 return MainExercises::extractLocalizedName($city, $favoriteLanguage)
                     . ' - '
@@ -107,17 +106,13 @@ class MainExercises
             $cityFactory->getEntities()
         );
 
-        $response = array_filter($cityCountryStringOrNullArray, function (string|null $el) { return is_string($el); });
-
-        return $response ;
-
+        return array_filter($cityCountryStringOrNullArray, function (string|null $el) { return is_string($el); }) ;
     }
 
     public static function joinGetMaybeEmptyEntities(Entity $subjectEntity, string $verb, EntityFactory $joinedFactory): array|null {
         $subjectEntity->factory->joinFactory($verb, $joinedFactory);
         $subjectEntity->factory->joinPopulate();
-        $joinedEntities = $subjectEntity->getJoinedEntities($verb);
-        return $joinedEntities;
+        return $subjectEntity->getJoinedEntities($verb);
     }
 
     public static function inferLanguage(System $sandra, Entity $entity): string {
@@ -159,7 +154,6 @@ class MainExercises
     }
 
     public function exercise4(Entity $entityToFindLanguage = null):array{
-
         //initialise datagraph to recreate tables
         $sandra = new System('testgame',true,env('DB_HOST'),env('DB_DATABASE'),
             env('DB_USERNAME'),env('DB_PASSWORD'));
